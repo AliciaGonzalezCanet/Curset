@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  SG_Odoo:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Permet accés a Odoo
+      VpcId: !GetAtt VPCId.Outputs.VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8069
+          ToPort: 8069
+          CidrIp: 0.0.0.0/0
+
+  SG_PostgreSQL:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Accés restringit a PostgreSQL
+      VpcId: !GetAtt VPCId.Outputs.VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref SG_Odoo
+
+Outputs:
+  SGOdooId:
+    Description: "ID del grup de seguretat d'Odoo"
+    Value: !Ref SG_Odoo
+    Export:
+      Name: SGOdooId
+
+  SGPostgresId:
+    Description: "ID del grup de seguretat de PostgreSQL"
+    Value: !Ref SG_PostgreSQL
+    Export:
+      Name: SGPostgresId

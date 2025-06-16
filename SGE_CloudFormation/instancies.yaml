@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  EC2_Odoo:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.small
+      ImageId: ami-0a7d80731ae1b2435
+      KeyName: odoo-key
+      SubnetId: !GetAtt SubnetPublicaId.Outputs.SubnetPublicaId 
+      SecurityGroupIds: !GetAtt SGOdooId.Outputs.SGOdooId
+      UserData: !Base64 |
+        #!/bin/bash
+        bash ./user_data/odoo-setup.sh
+
+  EC2_Postgres:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.small
+      ImageId: ami-0a7d80731ae1b2435
+      KeyName: odoo-key
+      SubnetId: !GetAtt SubnetPrivadaId.Outputs.SubnetPrivadaId 
+      SecurityGroupIds:  !GetAtt SGPostgresId.Outputs.SGPostgresId
+      UserData: !Base64 |
+        #!/bin/bash
+        bash ./user_data/postgres-setup.sh
+
+Outputs:
+  OdooInstanceId:
+    Description: "ID de la instància Odoo"
+    Value: !Ref EC2_Odoo
+
+  PostgresInstanceId:
+    Description: "ID de la instància PostgreSQL"
+    Value: !Ref EC2_Postgres
+
+  
